@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Video Event Segmentation Tool</title>
+    <style>
+      body {
+        font-family: 'Clear Sans', 'Helvetica neue', Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      #tool {
+        width: 100%;
+        max-width: 640px;
+        margin: 0 auto;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        display: flex; 
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #d3d6da;
+        margin: 24px auto;
+        height:50px;
+        width: 100%;
+        }
+
+      helpHeader {
+        display: flex; 
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #d3d6da;
+        margin: 2px auto;
+        height:45px;
+        width: 100%;
+        }
+        
+      #helpTitle {
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: 0.1rem;
+        text-transform: uppercase;
+        text-align: center;
+      }
+      
+      #title {
+        font-weight: 700;
+        font-size: 24px;
+        letter-spacing: 0.1rem;
+        text-transform: uppercase;
+        text-align: center;
+      }
+      #titles {
+        margin: 5px auto;
+        width: 640px;
+      }
+
+       #waveform-container, #video-container {
+        margin: 16px auto;
+        width: 640px;
+      }
+
+      #zoomview-container, #overview-container {
+        box-shadow: 3px 3px 20px #919191;
+        margin: 0 0 24px 0;
+        -moz-box-shadow: 3px 3px 20px #919191;
+        -webkit-box-shadow: 3px 3px 20px #919191;
+        line-height: 0;
+      }
+
+      #zoomview-container {
+        height: 200px;
+      }
+
+      #overview-container {
+        height: 85px;
+      }
+
+      #demo-controls {
+        margin: 0 auto 24px auto;
+        width: 1000px;
+        display: flex;
+        align-items: center;
+      }
+
+      #demo-controls button {
+        background: #fff;
+        border: 1px solid #919191;
+        cursor: pointer;
+      }
+
+      #audio {
+        flex: 0 0 30%;
+      }
+
+      #controls {
+        width: 100%;
+        flex: 1;
+        margin-left: 1em;
+      }
+
+      #seek-time {
+        width: 4em;
+      }
+
+      .log {
+        margin: 0 auto 24px auto;
+        width: 100%;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      table th {
+        text-align: left;
+      }
+
+      table th, table td {
+        padding: 0.5em;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      /* CSS */
+    .button-30 {
+      align-items: center;
+      appearance: none;
+      background-color: #FCFCFD;
+      border-radius: 4px;
+      border-width: 0;
+      box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
+      box-sizing: border-box;
+      color: #36395A;
+      cursor: pointer;
+      display: inline-flex;
+      /* font-family: monospace; */
+      height: 36px;
+      justify-content: center;
+      line-height: 1;
+      list-style: none;
+      margin-bottom: 5px;
+      overflow: hidden;
+      padding-left: 12px;
+      padding-right: 12px;
+      position: relative;
+      text-align: left;
+      text-decoration: none;
+      transition: box-shadow .15s,transform .15s;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      white-space: nowrap;
+      will-change: box-shadow,transform;
+      font-size: 12px;
+    }
+
+    .button-30:focus {
+      box-shadow: #D6D6E7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+    }
+
+    .button-30:hover {
+      box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+      transform: translateY(-2px);
+    }
+
+    .button-30:active {
+      box-shadow: #D6D6E7 0 3px 7px inset;
+      transform: translateY(2px);
+    }
+
+    .button-30.topbutton {
+      background-color: #FCFCFD;
+      width: 80%;
+    }
+
+    controlDivider {
+        display: flex; 
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #d3d6da;
+        margin: 5px auto;
+        margin-bottom: 10px;
+        height:3px;
+        width: 80%;
+        }
+
+    button.icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto; /* 15% from the top and centered */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 50%; /* Could be more or less, depending on screen size */
+    }
+
+    .help-modal-content {
+      background-color: #fefefe;
+      margin: 6% auto; /* 15% from the top and centered */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 60%; /* Could be more or less, depending on screen size */
+    }
+
+    /* The Close Button */
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .sidenav {
+      width: 360px;
+      position: fixed;
+      z-index: 0;
+      bottom: 15%;
+      right: 10px;
+      background: #eee;
+      overflow-x: hidden;
+      padding: 8px 0;
+      border-radius: 4px;   
+      opacity: 95%;
+    }
+
+    </style>
+  </head>
+  <body>
+    <div id="tool">
+      <header>
+        <div id="menu">
+          <button id="settings" class="icon">
+            <game-icon icon="settings" style="display:none;">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+              <path fill="var(--color-tone-3)" d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"></path>
+              </svg>
+          </game-icon>
+          </button> 
+        </div>
+
+        <div id="title">
+          VIDEO EVENT SEGMENTATION TOOL
+        </div>
+        <div id="menu">
+          <button id="help-button" class="icon" aria-label="help" onclick=openHelp()>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+              <path fill="var(--color-tone-3)" d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div id="titles">
+        <h2>Load a video file: 
+          <input type="file" id="video_input" class="file_video" accept="video/*"> 
+        </h2>
+        <!-- <input type="file" id="audio_input" class="file_audio"accept="audio/*" > -->
+        
+      </div>
+
+      <div id="video-container">
+        <video id="video" class="video" width="640" height="360" controls muted>
+          <source src="" type="video/mp4">
+        </video>
+        <!-- https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_av_prop_currenttime -->
+      </div>
+
+      <div id="waveform-container">
+        <div id="zoomview-container"></div>
+        <div id="overview-container"></div>
+      </div>
+
+      <div id="helpModal" class="modal">
+        <div class="help-modal-content">
+          <helpHeader>
+            <div></div>
+            <div id="helpTitle">How to use</div>
+            <span class="close">&times;</span>
+           </helpHeader>   
+
+          <div id="helpContent">
+            <p>The Video Event Segmentation Tool (VEST) is an open-source software 
+              for annotating temporal events in video clips. 
+            </p>
+            <p>You can annotate event "segments" with start & end times
+              or event "points" that indicate only the start time of an event. 
+            </p>
+            <h3>Basic instructions</h3>
+            <ol>
+              <li>
+                <p>Load your video file using the [Choose file] button</p>
+              </li>
+              <li>
+                <p>Define the name of the event segments and points using the [Add segment buttons] and [Add point buttons]. 
+                This will create buttons with your event names on them.</p>
+              </li>
+              <li>
+                <p>Click your label buttons to annotate segments or events as you watch your video.</p>
+              </li>
+              <li>
+                <p>When you are finished, save your annotations by using the [Download results] button.</p>
+              </li>
+            </ol>
+            <h3>Feedback</h3>
+            <p>Please leave feedback in the Github repository. 
+            </p>
+            
+            <h3>Privacy & security</h3>
+            <p>When using VEST, your videos and annotations are processed in your browser. 
+              This means your videos and annotations are just as private as being on your own laptop. 
+              This also means that you will lose any video and annotation progress when you close your browser.
+              Make sure you frequently save your data!
+            </p>
+
+            <h3>Licenses</h3>
+            <p>VEST uses <a href="https://github.com/bbc/peaks.js">peaks.js</a> 
+              and adheres to its <a href="https://github.com/bbc/peaks.js/blob/master/COPYING">license</a>.
+            </p>
+          </div>
+          <helpHeader></helpHeader>
+        </div>
+      </div>
+
+      <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <p>Please enter the name of the segment.</p>
+          <label for="lname">Segment ID: </label>
+          <input type="text" id="new-button-text" /><br><br>
+          <input class="button-30" type="submit" value="Create segment button" onclick=submitButton()>
+        </div>
+      </div>
+
+      <div id="myModalPoint" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <p>Please enter the name of the point.</p>
+          <label for="lname">Point ID: </label>
+          <input type="text" id="new-button-text-point" /><br><br>
+          <input class="button-30" type="submit" value="Create point button" onclick=submitButtonPoint()>
+        </div>
+      </div>
+
+      <div id="demo-controls">
+        <audio id="audio" class="audio" controls="controls">
+          <source src="" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+
+      </div>
+      <div class="sidenav">
+        <div id="controls">
+          <button class="button-30 topbutton" id="add-button" onclick=addButton()>Add segment buttons</button>
+          <div id="segment-buttons"></div>
+          <controlDivider></controlDivider>
+          <button class="button-30 topbutton" onclick=addButtonPoint()>Add point buttons</button>
+          <div id="point-buttons"></div>
+          <controlDivider></controlDivider>
+          <button class="button-30" data-action="zoom-in">Zoom in</button>
+          <button class="button-30" data-action="zoom-out">Zoom out</button>
+          <br>
+          <button class="button-30" data-action="playspeed">Play speed</button>
+          <input type="text" id="play-speed" value="1.0" style='width:5em'>
+          <br>
+          <label class="button-30" for="amplitude-scale">Amplitude scale</label>
+          <input type="range" id="amplitude-scale" min="0" max="10" step="1">
+          <button class="button-30" data-action="seek">Seek to seconds</button>
+          <input type="text" id="seek-time" value="0.0">
+          <controlDivider></controlDivider>
+          <button class="button-30" data-action="log-data">Log segments & points</button>
+          <button class="button-30" data-action="download">Download results</button>
+        </div>
+        </div>
+      <div class="log">
+        <div id="segments" class="hide">
+          <h2>Segments</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Label</th>
+                <th>Start time</th>
+                <th>End time</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="points" class="hide">
+          <h2>Points</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Label</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="FileSaver.min.js"></script>
+    <script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+    <script src="peaks.js"></script>
+    <script>
+      (function(Peaks) {
+        var renderSegments = function(peaks) {
+          var segmentsContainer = document.getElementById('segments');
+          var segments = peaks.segments.getSegments();
+          var html = '';
+
+          for (var i = 0; i < segments.length; i++) {
+            var segment = segments[i];
+
+            var row = '<tr>' +
+              '<td>' + segment.id + '</td>' +
+              '<td>' + segment.labelText + '</td>' +
+              '<td>' + segment.startTime + '</td>' +
+              '<td>' + segment.endTime + '</td>' +
+              '<td>' + '<a href="#' + segment.id + '" data-action="play-segment" data-id="' + segment.id + '">Play</a>' + '</td>' +
+              '<td>' + '<a href="#' + segment.id + '" data-action="remove-segment" data-id="' + segment.id + '">Remove</a>' + '</td>' +
+              '</tr>';
+            html += row;
+          }
+
+          segmentsContainer.querySelector('tbody').innerHTML = html;
+
+          if (html.length) {
+            segmentsContainer.classList.remove('hide');
+          }
+        }
+
+        var renderPoints = function(peaks) {
+          var pointsContainer = document.getElementById('points');
+          var points = peaks.points.getPoints();
+          var html = '';
+
+          for (var i = 0; i < points.length; i++) {
+            var point = points[i];
+
+            var row = '<tr>' +
+              '<td>' + point.id + '</td>' +
+              '<td>' + point.labelText + '</td>' +
+              '<td>' + point.time + '</td>' +
+              '<td>' + '<a href="#' + point.id + '" data-action="remove-point" data-id="' + point.id + '">Remove</a>' + '</td>' +
+              '</tr>';
+
+            html += row;
+          }
+
+          pointsContainer.querySelector('tbody').innerHTML = html;
+
+          if (html.length) {
+            pointsContainer.classList.remove('hide');
+          }
+        }
+
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        var audioContext = new AudioContext();
+
+        var audioElement = document.getElementById('audio');
+
+        var options = {
+          containers: {
+            zoomview: document.getElementById('zoomview-container'),
+            overview: document.getElementById('overview-container')
+          },
+          mediaElement: audioElement,
+          webAudio: {
+            audioContext: audioContext,
+            scale: 128,
+            multiChannel: false
+          },
+          emitCueEvents: true,
+          keyboard: true,
+          pointMarkerColor: '#006eb0',
+          showPlayheadTime: true,
+          zoomLevels: [128, 256, 512, 1024, 2048, 4096]
+        };
+
+        function loadAudioFile() {
+          var aud = document.getElementById('audio');
+          aud.src = document.getElementById('audio_input').value;
+        };
+
+        function loadVideoFile() {
+          var vid = document.getElementById('video');
+          vid.src = document.getElementById('video_input').value;
+        };
+
+        peak = Peaks.init(options, function(err, peaksInstance) {
+          window.peakVars = {peaksInstance: peaksInstance, 
+                            renderSegments: renderSegments, 
+                            renderPoints: renderPoints};
+
+          if (err) {
+            console.error(err.message);
+            return;
+          }
+
+          console.log('Peaks instance ready');
+
+          document.querySelector('[data-action="zoom-in"]').addEventListener('click', function() {
+            peaksInstance.zoom.zoomIn();
+          });
+
+          document.querySelector('[data-action="zoom-out"]').addEventListener('click', function() {
+            peaksInstance.zoom.zoomOut();
+          });
+
+          var matches = document.querySelectorAll('button[data-action="add-segment"]');
+          [].forEach.call(matches, function(match) {
+              // add eventlistner to each button.
+              match.addEventListener('click', function() {
+              startTime = peaksInstance.player.getCurrentTime()
+              peaksInstance.segments.add({
+                startTime: startTime,
+                endTime: startTime + 3,
+                labelText: this.innerHTML,
+                editable: true
+              });
+              renderSegments(peaksInstance);
+            });
+          });
+
+          var matches2 = document.querySelectorAll('button[data-action="add-point"]');
+          [].forEach.call(matches2, function(match2) {
+              // add eventlistner to each button.
+              match2.addEventListener('click', function() {
+              peaksInstance.points.add({
+                time: peaksInstance.player.getCurrentTime(),
+                labelText: this.innerHTML,
+                editable: true
+              });
+              renderPoints(peaksInstance);
+            });
+          });
+
+          document.querySelector('button[data-action="log-data"]').addEventListener('click', function(event) {
+            renderSegments(peaksInstance);
+            renderPoints(peaksInstance);
+          });
+
+          document.querySelector('button[data-action="seek"]').addEventListener('click', function(event) {
+            var time = document.getElementById('seek-time').value;
+            var seconds = parseFloat(time);
+
+            if (!Number.isNaN(seconds)) {
+              peaksInstance.player.seek(seconds);
+              vid.currentTime = peaksInstance.player.getCurrentTime();
+            }
+          });
+
+          document.querySelector('button[data-action="playspeed"]').addEventListener('click', function(event) {
+            var playspeedtxt = document.getElementById('play-speed').value;
+            var playspeed = parseFloat(playspeedtxt);
+
+            if (!Number.isNaN(playspeed)) {
+              var vid = document.getElementById("video");
+              vid.playbackRate = playspeed;
+              var aud = document.getElementById("audio");
+              aud.playbackRate = playspeed;
+            }
+          });
+
+          document.querySelector('button[data-action="download"]').addEventListener('click', function(event) {
+            // TODO: Download all the segmentation and point results.
+            console.log("Downloading");
+            segments = peaksInstance.segments.getSegments();
+            let toSave = {};
+            segments.forEach((obj) => {
+              toSave[obj._id] = { startTime: obj._startTime,
+                endTime: obj._endTime,
+                id: obj._id,
+                labelText: obj._labelText };
+            });
+
+            // Save points
+            points = peaksInstance.points.getPoints();
+            let toSavePoints = {};
+            points.forEach((obj) => {
+              toSavePoints[obj._id] = { startTime: obj._time,
+                id: obj._id,
+                labelText: obj._labelText };
+            });
+            var blob = new Blob([JSON.stringify(toSave),'\n',JSON.stringify(toSavePoints)], {type: "application/json"});
+            var saveAs = window.saveAs;
+            saveAs(blob, "segmentation_results.json");
+          });
+
+          document.querySelector('body').addEventListener('click', function(event) {
+            var element = event.target;
+            var action  = element.getAttribute('data-action');
+            var id      = element.getAttribute('data-id');
+
+            if (action === 'play-segment') {
+              var segment = peaksInstance.segments.getSegment(id);
+              peaksInstance.player.playSegment(segment);
+              vid.currentTime = peaksInstance.player.getCurrentTime();
+              vid.play()
+            }
+            else if (action === 'remove-point') {
+              peaksInstance.points.removeById(id);
+              renderSegments(peaksInstance);
+              renderPoints(peaksInstance);
+            }
+            else if (action === 'remove-segment') {
+              peaksInstance.segments.removeById(id);
+              renderSegments(peaksInstance);
+              renderPoints(peaksInstance);
+            }
+          });
+
+          var amplitudeScales = {
+            "0": 0.0,
+            "1": 0.1,
+            "2": 0.25,
+            "3": 0.5,
+            "4": 0.75,
+            "5": 1.0,
+            "6": 1.5,
+            "7": 2.0,
+            "8": 3.0,
+            "9": 4.0,
+            "10": 5.0
+          };
+
+          document.getElementById('amplitude-scale').addEventListener('input', function(event) {
+            var scale = amplitudeScales[event.target.value];
+
+            peaksInstance.views.getView('zoomview').setAmplitudeScale(scale);
+            peaksInstance.views.getView('overview').setAmplitudeScale(scale);
+          });
+
+          // Points mouse events
+
+          peaksInstance.on('points.mouseenter', function(point) {
+            console.log('points.mouseenter:', point);
+          });
+
+          peaksInstance.on('points.mouseleave', function(point) {
+            console.log('points.mouseleave:', point);
+          });
+
+          peaksInstance.on('points.dblclick', function(point) {
+            console.log('points.dblclick:', point);
+          });
+
+          peaksInstance.on('points.dragstart', function(point) {
+            console.log('points.dragstart:', point);
+          });
+
+          peaksInstance.on('points.dragmove', function(point) {
+            console.log('points.dragmove:', point);
+          });
+
+          peaksInstance.on('points.dragend', function(point) {
+            console.log('points.dragend:', point);
+          });
+
+          // DO STUFF ON VIDEOS
+          var vid = document.getElementById("video");
+          vid.defaultMuted = true;
+
+          peaksInstance.on('player_play', function(segment) {
+            vid.currentTime = peaksInstance.player.getCurrentTime();
+            vid.play()
+          });
+          peaksInstance.on('player_pause', function(segment) {
+            vid.currentTime = peaksInstance.player.getCurrentTime();
+            vid.pause()
+          });
+          peaksInstance.on('player_seek', function(segment) {
+            vid.currentTime = peaksInstance.player.getCurrentTime();
+          });
+
+          vid.onplay = function() {
+            peaksInstance.player.seek(vid.currentTime);
+            peaksInstance.player.play()
+          };
+
+          vid.onpause = function() {
+            peaksInstance.player.seek(vid.currentTime);
+            peaksInstance.player.pause()
+          };
+        });
+      })(peaks);
+
+      function openHelp() {
+          // Get the modal
+          var modal = document.getElementById("helpModal");
+          modal.style.display = "block";
+        };
+
+      function addButton() {
+          document.getElementById('new-button-text').value = "";
+          // Get the modal
+          var modal = document.getElementById("myModal");
+          modal.style.display = "block";
+        };
+
+      function addButtonPoint() {
+          document.getElementById('new-button-text-point').value = "";
+          // Get the modal
+          var modal = document.getElementById("myModalPoint");
+          modal.style.display = "block";
+        };
+
+      // Get the modal
+      var modal = document.getElementById("myModal");
+      var modalPoint = document.getElementById("myModalPoint");
+      var helpModal = document.getElementById("helpModal");
+
+      // Get the <span> element that closes the modal
+      var span = document.getElementsByClassName("close")[0];
+      var span2 = document.getElementsByClassName("close")[1];
+      var span3 = document.getElementsByClassName("close")[2];
+
+      // When the user clicks on <span> (x), close the modal
+      span.onclick = function() {
+        modal.style.display = "none";
+        modalPoint.style.display = "none";
+        helpModal.style.display = "none";
+      }
+      span2.onclick = function() {
+        modal.style.display = "none";
+        modalPoint.style.display = "none";
+        helpModal.style.display = "none";   
+      }
+      span3.onclick = function() {
+        modal.style.display = "none";
+        modalPoint.style.display = "none";
+        helpModal.style.display = "none";
+      }
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+        if (event.target == modalPoint) {
+          modalPoint.style.display = "none";
+        }
+        if (event.target == helpModal) {
+          helpModal.style.display = "none";
+        }
+      }
+
+      // Submit button
+      function submitButton () {
+        let btn = document.createElement("button");
+        var buttonValue = document.getElementById('new-button-text').value
+        btn.innerHTML = buttonValue;
+        btn.classList.add('button-30');
+        $(btn).attr("data-action", "add-segment");
+        btn.addEventListener('click', function() {
+          startTime = window.peakVars.peaksInstance.player.getCurrentTime()
+          window.peakVars.peaksInstance.segments.add({
+            startTime: startTime,
+            endTime: startTime + 3,
+            labelText: this.innerHTML,
+            editable: true
+          });
+          window.peakVars.renderSegments(window.peakVars.peaksInstance);
+        });
+        document.getElementById("segment-buttons").appendChild(btn);
+        var br = document.createElement("br");
+        document.getElementById("segment-buttons").appendChild(br);
+        modal.style.display = "none";
+      }
+
+      // Submit Point button
+      function submitButtonPoint () {
+        let btn = document.createElement("button");
+        var buttonValue = document.getElementById('new-button-text-point').value
+        btn.innerHTML = buttonValue;
+        btn.classList.add('button-30');
+        $(btn).attr("data-action", "add-point");
+        // add eventlistner to each button.
+        btn.addEventListener('click', function() {
+          window.peakVars.peaksInstance.points.add({
+            time: window.peakVars.peaksInstance.player.getCurrentTime(),
+            labelText: this.innerHTML,
+            editable: true
+          });
+          window.peakVars.renderPoints(window.peakVars.peaksInstance);
+        });
+
+        document.getElementById("point-buttons").appendChild(btn);
+        var br = document.createElement("br");
+        document.getElementById("point-buttons").appendChild(br);
+        modalPoint.style.display = "none";
+      }
+// https://stackoverflow.com/questions/36035721/how-can-i-set-preview-of-video-file-selecting-from-input-type-file/40580663
+      $ ("#video_input").change(function () {
+         var fileInput = document.getElementById('video_input');
+         var fileUrl = window.URL.createObjectURL(fileInput.files[0]);
+         $(".video").attr("src", fileUrl);
+         $(".audio").attr("src", fileUrl);
+      });
+      // $ ("#audio_input").change(function () {
+      //    var fileInput = document.getElementById('audio_input');
+      //    var fileUrl = window.URL.createObjectURL(fileInput.files[0]);
+      //    $(".audio").attr("src", fileUrl);
+      // });
+    </script>
+  </body>
+</html>
