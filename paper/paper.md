@@ -27,12 +27,12 @@ Researchers have used video recordings of human and animal behaviors to analyze 
 
 Selection of tools to identiy segment events in videos are limited. Especially for qualitative coding of videos, most tools are proprietary, require installation, and difficult to use [@hellwig2007eudico; @wikipedia]. VEST offers significant improvement in these domains. First, VEST is free and open-source. Users can simply use the browser interface or modify it to suit there needs. Second, VEST does not require installation nor a license subscription. Lastly, VEST is easy to use. Users can load a video which will automatically render with audio waveforms utilizing the peaks.js [@peaksjs] framework. Users can then add buttons with custom labels for creating segmentations as they watch the video. The audio waveform helps demarcate the start and end points of each event segment with greater precision (Figure 1). 
 
-![Figure 1. Screenshot of VEST in action. Labels for event segmentations can be customized by users.](Figure1.png){ width=60% }
+![Figure 1. Screenshot of VEST in action. Labels for event segmentations can be customized by users.](Figure1.png)
 
-The simplicity of the tools allows it to be used in diverse ways. To name a few ideas:  
-- Segment who is speaking and when in conversation videos to compare speech durations, gaps in conversations, and overlapping speech.
-- Label occurence of complex social behaviors such as agreement, disagreement, or alienating an individual.
-- Label facial expressions from face video recordings.
-- Segment the start and end times of animal behaviors such as grooming, socializing, and feeding.
+The simplicity of the tools allows it to be used in diverse ways. Here are examples of how VEST can be used:
+* Segment who is speaking and when in conversation videos to compare speech durations, gaps in conversations, and overlapping speech.  
+* Label occurence of complex social behaviors such as agreement, disagreement, or alienating an individual.  
+* Label facial expressions from face video recordings.  
+* Segment the start and end times of animal behaviors such as grooming, socializing, and feeding.  
 
 # References
