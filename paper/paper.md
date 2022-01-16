@@ -1,5 +1,5 @@
 ---
-title: 'VEST: Video event segmentation tool for qualitative event annotations'
+title: 'Video event segmentation tool (VEST) for qualitative coding of video clips'
 tags:
   - Javascript
   - Psychology
