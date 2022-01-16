@@ -29,10 +29,6 @@ Selection of tools to identiy segment events in videos are limited. Especially f
 
 ![Figure 1. Screenshot of VEST in action. Labels for event segmentations can be customized by users.](Figure1.png)
 
-The simplicity of the tools allows it to be used in diverse ways. Here are examples of how VEST can be used:
-* Segment who is speaking and when in conversation videos to compare speech durations, gaps in conversations, and overlapping speech.  
-* Label occurence of complex social behaviors such as agreement, disagreement, or alienating an individual.  
-* Label facial expressions from face video recordings.  
-* Segment the start and end times of animal behaviors such as grooming, socializing, and feeding.  
+The simplicity of the tools allows it to be used in diverse ways. Here are examples of how VEST can be used: 1) segment who is speaking and when in conversation videos to compare speech durations, gaps in conversations, and overlapping speech, 2) label occurence of complex social behaviors such as agreement, disagreement, or alienating an individual, 3) label facial expressions from face video recordings, and 4) segment the start and end times of animal behaviors such as grooming, socializing, and feeding.  
 
 # References
