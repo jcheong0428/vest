@@ -14,6 +14,43 @@ Easiest way to use VEST is through the online app at [https://jinhyuncheong.com/
 - Click your label buttons to annotate segments or events as you watch your video.
 - When you are finished, save your annotations by using the [Download results] button.
 
+# Analyzing VEST outputs
+VEST saves the segmentations into a json file that can be loaded in most coding languages (e.g. Python, R). Here is a sample code to load the outputs in Python [[Gist](https://gist.github.com/jcheong0428/785394bd3710e309790c1a99170d7da5)]. 
+
+"""Python
+import pandas as pd
+
+def parse_vest_json(f):
+  """Parse json output from VEST
+
+  Args:
+    f: path to VEST json output
+  
+  Returns:
+    segmentations dataframe
+    points dataframe
+  """
+  seg_df, pts_df = pd.DataFrame(), pd.DataFrame()
+
+  df = pd.read_json(f, lines=True)
+  seg_cols = [col for col in df.columns if 'segment' in col]
+  _seg_df = df[seg_cols].dropna().T
+  for rowix, row in _seg_df.iterrows():
+      seg_df = pd.concat([seg_df, pd.DataFrame(row.values[0],index=[row.name])])
+
+  pts_cols = [col for col in df.columns if 'point' in col]
+  _pts_df = df[pts_cols].dropna().T
+  for rowix, row in _pts_df.iterrows():
+      pts_df = pd.concat([pts_df, pd.DataFrame(row.values[0], index=[row.name])])
+  return seg_df, pts_df
+
+
+path_to_file = "/content/segmentation_results.json"
+seg_df, pts_df = parse_vest_json(f=path_to_file)
+display(seg_df, pts_df)
+"""
+
+
 # Screenshot
 ![Screenshot of VEST in action](paper/Figure1.png?raw=true "Screenshot of VEST in action.")
 
