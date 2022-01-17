@@ -17,7 +17,7 @@ Easiest way to use VEST is through the online app at [https://jinhyuncheong.com/
 # Analyzing VEST outputs
 VEST saves the segmentations into a json file that can be loaded in most coding languages (e.g. Python, R). Here is a sample code to load the outputs in Python [[Gist](https://gist.github.com/jcheong0428/785394bd3710e309790c1a99170d7da5)]. 
 
-"""
+```python
 import pandas as pd
 
 def parse_vest_json(f):
@@ -48,7 +48,7 @@ def parse_vest_json(f):
 path_to_file = "/content/segmentation_results.json"
 seg_df, pts_df = parse_vest_json(f=path_to_file)
 display(seg_df, pts_df)
-"""
+```
 
 
 # Screenshot
