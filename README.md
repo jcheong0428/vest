@@ -5,6 +5,9 @@ The Video Event Segmentation Tool (VEST) is an open-source software for annotati
 You can annotate event "segments" with start & end times or event "points" that indicate only the start time of an event.
 
 # Basic instructions
+
+More detailed tutorial is available [here](https://towardsdatascience.com/how-to-use-vest-a-free-online-tool-for-segmenting-video-clips-a6ec50e29971?sk=2065cb12567832eef625bbba810543b6). 
+
 ### 1. Installation  
 Easiest way to use VEST is through the online app at [https://jinhyuncheong.com/vest/vest.html](https://jinhyuncheong.com/vest/vest.html). Alternatively, you can clone this repo and launch `index.html` in your browser. 
 
@@ -52,7 +55,7 @@ display(seg_df, pts_df)
 
 
 # Screenshot
-![Screenshot of VEST in action](paper/Figure1.png?raw=true "Screenshot of VEST in action.")
+![Screenshot of VEST in action](assets/Figure1.png?raw=true "Screenshot of VEST in action.")
 
 # License
 VEST uses [peaks.js](https://github.com/bbc/peaks.js/) and abides by its [license](https://github.com/bbc/peaks.js/blob/master/COPYING).
